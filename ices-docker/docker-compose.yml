@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+    ices:
+        image: ices_docker
+        container_name: ices_sustcast
+        volumes:
+          - ./data:/etc/ices
+          - ./music:/music
+          - ./playlist:/playlist
+          - ./log:/var/log/ices
+        restart: always
