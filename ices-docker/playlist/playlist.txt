@@ -1,2 +1,2 @@
-/music/test.ogg
-/music/test2.ogg
+/music/buffer.ogg
+/music/current.ogg

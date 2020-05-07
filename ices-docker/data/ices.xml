@@ -16,9 +16,9 @@
     <stream>
         <!-- metadata used for stream listing (not currently used) -->
         <metadata>
-            <name>Example stream name</name>
-            <genre>Example genre</genre>
-            <description>A short description of your stream</description>
+            <name>SUSTcast</name>
+            <genre>Campus Radio</genre>
+            <description>SUSTcast is the campus radio for Shahjalal University of Science and Technology</description>
         </metadata>
 
         <!-- input module
@@ -53,12 +53,12 @@
             same server.  -->
         <instance>
             <!-- Server details:
-                You define hostname and port for the server here, along with
+                You define hostname and port for the sever here, along with
                 the source password and mountpoint.  -->
             <hostname>103.84.159.230</hostname>
             <port>8000</port>
             <password>alchemist</password>
-            <mount>/example1.ogg</mount>
+            <mount>/sustcast.ogg</mount>
             <yp>1</yp>   <!-- allow stream to be advertised on YP, default 0 -->
 
             <!-- Reconnect parameters:
@@ -70,8 +70,8 @@
                 indefinately. Suggest setting reconnectdelay to a large value
                 if you do this.
             -->
-            <reconnectdelay>2</reconnectdelay>
-            <reconnectattempts>5</reconnectattempts> 
+            <reconnectdelay>10</reconnectdelay>
+            <reconnectattempts>-1</reconnectattempts> 
 
             <!-- maxqueuelength:
                 This describes how long the internal data queues may be. This
