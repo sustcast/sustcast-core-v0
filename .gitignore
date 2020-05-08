@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# sustcast
+ices.xml
+
 # C extensions
 *.so
 
