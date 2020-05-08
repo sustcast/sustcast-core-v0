@@ -55,9 +55,9 @@
             <!-- Server details:
                 You define hostname and port for the sever here, along with
                 the source password and mountpoint.  -->
-            <hostname>103.84.159.230</hostname>
-            <port>8000</port>
-            <password>alchemist</password>
+            <hostname></hostname>
+            <port></port>
+            <password></password>
             <mount>/sustcast.ogg</mount>
             <yp>1</yp>   <!-- allow stream to be advertised on YP, default 0 -->
 
