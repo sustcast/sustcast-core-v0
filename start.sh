@@ -5,7 +5,7 @@ cd ..
 
 cd core/
 source venv/bin/activate
-python main.py
+python Main.py
 cd ..
 
 cd ices-docker
