@@ -4,6 +4,7 @@ filename = '../../ices-docker/log/ices.log'
 lineCheck = -4
 lineCheckIncre = 1
 
+
 def findLastPlayedFile():
     global filename
     global lineCheck
@@ -11,7 +12,7 @@ def findLastPlayedFile():
 
     line = subprocess.check_output(['tail', str(lineCheck), filename]).split('\n')
     for ln in reversed(line):
-        #print(ln)
+        # print(ln)
         if ln.find("INFO playlist-builtin/playlist_read Currently playing \"/music/current.ogg\"") > 0:
             print("current")
             return
@@ -21,7 +22,7 @@ def findLastPlayedFile():
 
     lineCheck -= lineCheckIncre
     findLastPlayedFile()
-    
+
 
 findLastPlayedFile()
 print("done")
