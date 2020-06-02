@@ -1,2 +1,2 @@
-/music/buffer.ogg
-/music/current.ogg
+/music/currentA.ogg
+/music/currentB.ogg
