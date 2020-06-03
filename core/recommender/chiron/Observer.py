@@ -39,16 +39,20 @@ def is_music_inserted(music):
     
     sql = 'SELECT title,artist FROM songs WHERE title="'+music["title"].lower()+'" AND artist="'+ music["artist"].lower()+'"'
     
-    cur = conn.cursor()
-    cur.execute(sql)
-    rows = cur.fetchall()
+    try:
+        cur = conn.cursor()
+        cur.execute(sql)
+        rows = cur.fetchall()
+
+        if(len(rows) > 0):
+            return True
+        else:
+            return False
+    except :
+        print(TAG,"ERROR in is_music_inserted")
+        print(sql)
+    
     conn.close()
-
-    if(len(rows) > 0):
-        return True
-    else:
-        return False
-
 
 
 def get_all_music():
@@ -134,10 +138,23 @@ def insert_music_yt_data(music,update):
         sql = 'INSERT INTO yt_data(song_id,views,duration,url_id,view_increased) VALUES('+str(music["song_id"])+','+music["views"]+','+music["duration"]+',"'+ music["url_id"]+'",'+ music["view_increased"]+')'
 
 
-    cur = conn.cursor()
+    try:
+        cur = conn.cursor()
+        cur.execute(sql)    
     cur.execute(sql)
-    
-    conn.commit()
+        cur.execute(sql)    
+    cur.execute(sql)
+        cur.execute(sql)    
+    cur.execute(sql)
+        cur.execute(sql)    
+    cur.execute(sql)
+        cur.execute(sql)    
+        conn.commit()
+
+    except:
+        print(TAG,"error in insert_yt_data")
+        print(sql)
+
     conn.close()
 
 
