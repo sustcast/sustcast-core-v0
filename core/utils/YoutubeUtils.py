@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import random
 import json
 import isodate
+import youtube_dl
 
 def getYtIdFromMusicName(music):
     r = random.randint(1, 5)
@@ -11,7 +12,7 @@ def getYtIdFromMusicName(music):
     results = json.loads(YoutubeSearch(music, max_results=r).to_json())
 
     try:
-        return results['videos'][0]['id']
+        return results['videos'][0]['id'][:11]
     except:
         return ""
 
@@ -34,7 +35,7 @@ def downloadMp3(id):
 
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl' : "../temp/download.%(ext)s",
+        'outtmpl' : "temp/download.%(ext)s",
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',

@@ -1,6 +1,13 @@
 import time
 from scheduler import Scheduler
-import CsvUtils
+from utils import Constant
+from utils import Helper
+from utils import YoutubeUtils
+from recommender_chiron import Chiron
+from recommender_chiron import Observer
+from utils import CsvUtils
+import SongDownload
+from shutil import copyfile
 
 
 def initThreads():
@@ -12,4 +19,49 @@ def initThreads():
         print("Error: unable to start newsFetcher thread")
     '''
 
-Scheduler.hello_world()
+def setModules():
+    Scheduler.set_recommender(Chiron)
+    Observer.set_modules(CsvUtils,YoutubeUtils)
+
+
+
+setModules()
+first_load = True
+
+while True :
+
+    current_music = Helper.findLastPlayedFile()
+    
+    next_music = Scheduler.shuffle()
+
+    if first_load == True:
+        prev_music = next_music
+        first_load = False
+
+    else:
+        while next_music["url"].find(prev_music["url"]) >= 0:
+            next_music = Scheduler.shuffle()
+
+    print(next_music)
+    prev_music = next_music
+    SongDownload.downloadOgg(next_music)
+
+    if( current_music.find("A") < 0 ):
+        copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
+    else:
+        copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
+
+    
+    while current_music.find(Helper.findLastPlayedFile()) >= 0:
+        time.sleep(60)
+
+
+
+
+
+
+
+    
+
+
+

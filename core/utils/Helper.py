@@ -1,3 +1,5 @@
+import subprocess
+
 # helper functions
 def retTimeHour():
     localtime = time.asctime(time.localtime(time.time()))
@@ -36,9 +38,31 @@ def writeFile(string, path):
     file.write(string)
     file.close
 
+
 def selectElementRandmom(ls):
     l = len(ls)
     r = random.randint(0, l-1)
     ret = ls[r]
 
     return ret
+
+
+
+
+def findLastPlayedFile():
+
+    filename = '../ices-docker/log/ices.log'
+    lineCheck = -50
+    lineCheckIncre = 1
+
+    line = subprocess.check_output(['tail',str(lineCheck), filename]).decode("utf-8").split('\n')
+    #print(reversed(line))
+    for ln in reversed(line):
+        #print(ln)
+        if ln.find("INFO playlist-builtin/playlist_read Currently playing \"/music/currentA.ogg\"") > 0:
+            return "currentA.ogg"
+
+        elif ln.find("INFO playlist-builtin/playlist_read Currently playing \"/music/currentB.ogg\"") > 0:
+            return "currentB.ogg"
+
+    findLastPlayedFile()

@@ -1,4 +1,8 @@
-CsvUtils = __import__("CsvUtils","../utils")
+def set_recommender(module):
+    global Recommender
+    Recommender = module
 
-def hello_world():
-    CsvUtils.hello_world()
+
+def shuffle():
+    music = Recommender.recommend()
+    return music
