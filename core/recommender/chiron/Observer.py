@@ -195,7 +195,7 @@ def observe():
     print(TAG,"completed...")
 
 
-#importMusicsFromCsv()
+importMusicsFromCsv()
 
-#observe()
+observe()
 
