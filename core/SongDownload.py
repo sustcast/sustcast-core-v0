@@ -9,7 +9,7 @@ def downloadOgg(music):
 
     url = music['url']
     if(url.find("https://www.youtube.com/watch") == 0):
-        YoutubeUtils.downloadMp3(url.replace("https://www.youtube.com/watch?",""))
+        YoutubeUtils.downloadMp3(url.replace("https://www.youtube.com/watch?v=",""))
 
     AudioSegment.from_mp3(Constant.default_mp3_download_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': music['artist'], 'title': music['title']})
 

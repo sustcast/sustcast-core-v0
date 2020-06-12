@@ -42,7 +42,7 @@ def get_db_connection(db_file):
 def is_music_inserted(music):
     conn = get_db_connection(chiron_db_path)
     
-    sql = 'SELECT title,artist FROM songs WHERE title="'+music["title"].lower()+'" AND artist="'+ music["artist"].lower()+'"'
+    sql = 'SELECT title,artist FROM songs WHERE title="'+music["title"].lower().replace('"','\'')+'" AND artist="'+ music["artist"].lower().replace('"','\'')+'"'
     
     try:
         cur = conn.cursor()
@@ -53,8 +53,34 @@ def is_music_inserted(music):
             return True
         else:
             return False
-    except :
+            
+    except Exception as e:
+        print(e)
         print(TAG,"ERROR in is_music_inserted")
+        print(sql)
+    
+    conn.close()
+
+
+
+def is_music_id_in_yt_data(id):
+    conn = get_db_connection(chiron_db_path)
+
+    sql = 'SELECT id FROM yt_data WHERE song_id='+str(id)
+    
+    try:
+        cur = conn.cursor()
+        cur.execute(sql)
+        rows = cur.fetchall()
+
+        if(len(rows) > 0):
+            return True
+        else:
+            return False
+            
+    except Exception as e:
+        print(e)
+        print(TAG,"ERROR in is_music_id_in_yt_data")
         print(sql)
     
     conn.close()
@@ -71,6 +97,8 @@ def get_all_music():
     conn.close()
 
     return rows
+
+
 
 def get_all_music_yt_data():
     conn = get_db_connection(chiron_db_path)
@@ -129,6 +157,8 @@ def get_music_id(music):
     else:
         return ""
 
+
+
 def get_music_views(url_id):
     conn = get_db_connection(chiron_db_path)
     
@@ -145,11 +175,10 @@ def get_music_views(url_id):
         return -1
 
 
-
 def insert_music(music):
     conn = get_db_connection(chiron_db_path)
 
-    sql = 'INSERT INTO songs(title,artist) VALUES("'+music["title"].lower()+'","'+ music["artist"].lower()+'")'
+    sql = 'INSERT INTO songs(title,artist) VALUES("'+music["title"].lower().replace('"','\'')+'","'+ music["artist"].lower().replace('"','\'')+'")'
     
     cur = conn.cursor()
     cur.execute(sql)
@@ -166,19 +195,55 @@ def insert_music_yt_data(music,update):
     
     else:
         sql = 'INSERT INTO yt_data(song_id,views,duration,url_id,view_increased) VALUES('+str(music["song_id"])+','+music["views"]+','+music["duration"]+',"'+ music["url_id"]+'",'+ music["view_increased"]+')'
-
-
+    
     try:
         cur = conn.cursor()
-        cur.execute(sql)    
+        cur.execute(sql)
         conn.commit()
+        conn.close()
 
-    except:
+    except sqlite3.IntegrityError as ex1:
+        conn.close()
+        delete_music(music["song_id"])
+
+    except Exception as ex2:
+        print(ex2)
         print(TAG,"error in insert_yt_data")
         print(sql)
+        conn.close()
 
-    conn.close()
 
+def delete_music(id):
+    if is_music_id_in_yt_data(id):
+        connA = get_db_connection(chiron_db_path)
+        sql = "DELETE FROM yt_data WHERE song_id="+str(id)
+        
+        try:
+            cur = connA.cursor()
+            cur.execute(sql)
+            connA.commit()
+            connA.close()
+        
+        except Exception as ex1:
+            print(ex1)
+            print(TAG,"error delete_music")
+            print(sql)
+            connA.close()
+
+    connB = get_db_connection(chiron_db_path)
+    sql = "DELETE FROM songs WHERE id="+str(id)
+    
+    try:
+        cur = connB.cursor()
+        cur.execute(sql)
+        connB.commit()
+        connB.close() 
+
+    except Exception as ex2:
+        print(ex2)
+        print(TAG,"error delete_music")
+        print(sql)
+        connB.close() 
 
 
 def importMusicsFromCsv():
@@ -187,7 +252,6 @@ def importMusicsFromCsv():
      for music in music_list:
          if(is_music_inserted(music) == False):
              insert_music(music)
-
 
 
 def observe():
@@ -208,15 +272,52 @@ def observe():
 
         if len(url_id) > 0:
             data_exists_flg = True
+           
+           ###
+            continue
 
-        while len(url_id) == 0:
-            url_id = YoutubeUtils.getYtIdFromMusicName(music['artist'] + " - " + music["title"])
+        ###
+        print(TAG,"check1")
 
+        retry = 5
+        while len(url_id) == 0 and retry > 0:
+            try:
+                url_id = YoutubeUtils.getYtIdFromMusicName(music['artist'] + " - " + music["title"])
+                retry = retry - 1
+                
+            except Exception as e:
+                print(e)
+                print(TAG,"error in crawling....will wait for 60s")
+                time.sleep(60)
+
+        if retry == 0:
+            delete_music(get_music_id(music))
+            print(TAG,"did not found in yt",music)
+            continue
+
+###
+        print(TAG,"check2")
+        
         yt_views = ""
         yt_duration = ""
-        while len(yt_views) == 0 and len(yt_duration) == 0:
-            yt_views, yt_duration = YoutubeUtils.getDuration_n_ViewsFromId(url_id)
+        retry = 5 
+        while len(yt_views) == 0 and len(yt_duration) == 0 and retry > 0:
+            try:
+                yt_views, yt_duration = YoutubeUtils.getDuration_n_ViewsFromId(url_id)
+                retry = retry - 1
 
+            except Exception as e:
+                print(e)
+                print(TAG,"error in crawling....will wait for some time")
+                time.sleep(60)
+
+        if retry == 0:
+            delete_music(get_music_id(music))
+            print(TAG,url_id+"is not available in yt",music)
+            continue
+###
+        print(TAG,"check3")
+        
         prev_views = get_music_views(url_id)
         if  prev_views >= 0:
             yt_view_increase = str(int(yt_views) - prev_views )
@@ -229,6 +330,8 @@ def observe():
         music["song_id"] = get_music_id(music)
         music["view_increased"] = yt_view_increase
 
+        ##
+        print(TAG,music)
         insert_music_yt_data(music,data_exists_flg)
 
     print(TAG,"completed...")

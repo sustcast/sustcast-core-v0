@@ -12,14 +12,13 @@ observer_flag = False
 def observe():
 
     while True:
+        #Observer.importMusicsFromCsv()
+        Observer.observe()
         cur = dt.datetime.now()
         mid_night = dt.datetime(cur.year,cur.month,cur.day,23,59,59)
 
         wait_time = (mid_night - cur).total_seconds()
         time.sleep(wait_time)
-
-        Observer.importMusicsFromCsv()
-        Observer.observe()
 
 
 
@@ -45,11 +44,11 @@ def recommend():
     cut_off_constant = 10000
     for music in dataset:
         model = {
-            "url": "https://www.youtube.com/watch?"+ music["url_id"],
+            "url": "https://www.youtube.com/watch?v="+ music["url_id"],
             "artist": music["artist"],
             "title":music["title"],
             "duration":music["duration"],
-            "score": int(music["views"]*music["view_increased"]/cut_off_constant)
+            "score": int((music["view_increased"])/cut_off_constant)
         }
         
         if(model["score"] > 0):

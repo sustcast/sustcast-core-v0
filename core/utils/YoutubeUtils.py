@@ -30,6 +30,18 @@ def getDuration_n_ViewsFromId(id):
     except :
         return "",""
 
+def getTitleFromId(id):
+    url = "https://www.youtube.com/watch?v="+id
+    soup = BeautifulSoup(requests.get(url).text, 'lxml')
+    
+    try:
+        title = soup.select_one('meta[itemprop="name"][content]')['content']
+
+        return title
+    
+    except :
+        return ""
+
 
 def downloadMp3(id):
 
