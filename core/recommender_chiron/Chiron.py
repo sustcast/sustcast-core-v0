@@ -13,7 +13,7 @@ def observe():
 
     while True:
         #Observer.importMusicsFromCsv()
-        Observer.observe()
+        #Observer.observe()
         cur = dt.datetime.now()
         mid_night = dt.datetime(cur.year,cur.month,cur.day,23,59,59)
 

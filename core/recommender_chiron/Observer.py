@@ -256,6 +256,9 @@ def importMusicsFromCsv():
 
 def observe():
 
+# TODO observe a song based on the last-time it was observed. 
+# TODO make a DB cleaning conditions for removing non-trendy songs. view_increased = 0 -> views < 1 million
+
     print(TAG,"started...")
 
     music_list = get_all_music()
