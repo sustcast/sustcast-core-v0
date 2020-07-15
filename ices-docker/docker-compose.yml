@@ -2,7 +2,7 @@ version: "2"
 
 services:
     ices:
-        image: ices_docker
+        build: .
         container_name: ices_sustcast
         volumes:
           - ./data:/etc/ices
