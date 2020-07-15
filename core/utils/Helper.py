@@ -1,4 +1,5 @@
 import subprocess
+import re
 
 # helper functions
 def retTimeHour():
@@ -66,3 +67,17 @@ def findLastPlayedFile():
             return "currentB.ogg"
 
     findLastPlayedFile()
+
+def ytVideoTitleFilter(title):
+
+    title = title.lower()
+
+    title = re.sub("[\(\[].*?[\)\]]", "", title)
+
+    title = title.replace("  "," ")
+
+    title = title.strip()
+    title = title.title()
+    return title
+
+#print (ytVideoTitleFilter('Given Up (Official Video HQ) - Linkin Park (asdoijasoidjo)'))

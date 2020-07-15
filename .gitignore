@@ -7,7 +7,6 @@ __pycache__/
 
 # sustcast
 ices.xml
-
 # C extensions
 *.so
 
