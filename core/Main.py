@@ -9,6 +9,11 @@ from utils import CsvUtils
 import SongDownload
 from shutil import copyfile
 from firebase import FireBaseUtil
+import logging
+
+logging.basicConfig(filename='sustcast_error.log', level=logging.DEBUG, 
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
+logger=logging.getLogger(__name__)
 
 def initThreads():
     print("just for later use")
@@ -27,8 +32,15 @@ def setModules():
 
 setModules()
 first_load = True
+next_music = {}
+prev_music = {}
 
-while True :
+
+def main():
+
+    global next_music
+    global prev_music
+    global first_load
 
     current_music = Helper.findLastPlayedFile()
     
@@ -74,10 +86,8 @@ while True :
 
 
 
-
-
-
-    
-
-
-
+while True:
+    try: 
+        main()
+    except Exception as err :
+        logger.error(err)
