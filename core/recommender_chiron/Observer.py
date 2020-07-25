@@ -4,6 +4,7 @@ import random
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
+import os
 
 # spec = importlib.util.spec_from_file_location("CsvUtils", "../utils/CsvUtils.py")
 # CsvUtils = importlib.util.module_from_spec(spec)
@@ -326,8 +327,14 @@ def observe():
                 time.sleep(60)
 
         if retry == 0:
-            delete_music(get_music_id(music))
-            print(TAG, "did not found in yt", music)
+            r = os.system("ping -c 1 google.com")
+            if r == 0:
+                delete_music(get_music_id(music))
+                print(TAG, "did not found in yt", music)
+            else:
+                print(TAG,"NET DOWN!!!")
+                time.sleep(3600)
+
             continue
 
         ###
@@ -348,8 +355,14 @@ def observe():
                 time.sleep(60)
 
         if retry == 0:
-            delete_music(get_music_id(music))
-            print(TAG, url_id+"is not available in yt", music)
+            r = os.system("ping -c 1 google.com")
+            if r == 0:
+                delete_music(get_music_id(music))
+                print(TAG, url_id+"is not available in yt", music)
+            else:
+                print(TAG,"NET DOWN!!!")
+                time.sleep(3600)
+            
             continue
         ###
         #print(TAG, "check3")
@@ -371,7 +384,6 @@ def observe():
         music["last_observed_datetime"]=current_datetime.strftime(ISOFORMAT)
 
         ##
-        print(TAG, music)
         # time.sleep(200000)
 
         #### should we delete it?
@@ -384,6 +396,9 @@ def observe():
             continue
 
         insert_music_yt_data(music, data_exists_flg)
+        
+        ##
+        print(TAG, music)
 
     print(TAG, "completed...")
 
