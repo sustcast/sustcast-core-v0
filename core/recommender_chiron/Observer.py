@@ -198,6 +198,9 @@ def get_last_observed_datetime(url_id):
 def insert_music(music):
     conn = get_db_connection(chiron_db_path)
 
+    music["artist"] = music["artist"].strip()
+    music["title"] = music["title"].strip()
+
     sql = 'INSERT INTO songs(title,artist) VALUES("'+music["title"].lower().replace(
         '"', '\'')+'","' + music["artist"].lower().replace('"', '\'')+'")'
 
@@ -271,11 +274,21 @@ def delete_music(id):
 
 
 def importMusicsFromCsv():
+
     music_list = CsvUtils.readDataFromCsv(music_list_csv_path)
 
+
     for music in music_list:
+        
+        if music["artist"] == '' or music["title"] == '':
+            continue
+
         if(is_music_inserted(music) == False):
             insert_music(music)
+
+    data = [{"artist":"","title":""}]
+
+    CsvUtils.writeDataToCsv(music_list_csv_path,data)
 
 
 def observe():

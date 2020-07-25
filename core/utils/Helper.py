@@ -2,6 +2,8 @@ import subprocess
 import re
 
 # helper functions
+
+
 def retTimeHour():
     localtime = time.asctime(time.localtime(time.time()))
     hour = 0
@@ -48,18 +50,16 @@ def selectElementRandmom(ls):
     return ret
 
 
-
-
 def findLastPlayedFile():
 
     filename = '../ices-docker/log/ices.log'
     lineCheck = -50
     lineCheckIncre = 1
 
-    line = subprocess.check_output(['tail',str(lineCheck), filename]).decode("utf-8").split('\n')
-    #print(reversed(line))
+    line = subprocess.check_output(['tail', str(lineCheck), filename]).decode("utf-8").split('\n')
+    # print(reversed(line))
     for ln in reversed(line):
-        #print(ln)
+        # print(ln)
         if ln.find("INFO playlist-builtin/playlist_read Currently playing \"/music/currentA.ogg\"") > 0:
             return "currentA.ogg"
 
@@ -68,13 +68,14 @@ def findLastPlayedFile():
 
     findLastPlayedFile()
 
+
 def ytVideoTitleFilter(title):
 
     title = title.lower()
 
     title = re.sub("[\(\[].*?[\)\]]", "", title)
 
-    title = title.replace("  "," ")
+    title = title.replace("  ", " ")
 
     title = title.strip()
     title = title.title()

@@ -12,7 +12,6 @@ observer_flag = False
 def observe():
 
     while True:
-        #Observer.importMusicsFromCsv()
         Observer.observe()
         
         cur = dt.datetime.now()
@@ -21,11 +20,20 @@ def observe():
         wait_time = (mid_night - cur).total_seconds()
         time.sleep(wait_time)
 
+def music_importer():
+
+    while True:
+        Observer.importMusicsFromCsv()
+        
+        wait_time = 60
+        time.sleep(wait_time)
+
 
 
 def initObserver():
     try:
         _thread.start_new_thread(observe, ())
+        _thread.start_new_thread(music_importer, ())
     except Exception as e:
         print(e)
         print(TAG,"observer thread init failed")
