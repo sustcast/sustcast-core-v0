@@ -330,9 +330,11 @@ def observe():
         retry=5
         while len(url_id) == 0 and retry > 0:
             try:
-                url_id=YoutubeUtils.getYtIdFromMusicName(
-                    music['artist'] + " - " + music["title"])
+                url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " " + music["title"])
                 retry=retry - 1
+                ##
+                print(TAG,"url search")
+                print(url_id)
 
             except Exception as e:
                 print(e)
@@ -342,7 +344,6 @@ def observe():
         if retry == 0:
             r = os.system("ping -c 1 google.com")
             if r == 0:
-                delete_music(get_music_id(music))
                 print(TAG, "did not found in yt", music)
             else:
                 print(TAG,"NET DOWN!!!")
