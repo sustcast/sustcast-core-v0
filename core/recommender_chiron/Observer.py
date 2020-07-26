@@ -331,7 +331,7 @@ def observe():
         while len(url_id) == 0 and retry > 0:
             try:
                 retry=retry - 1
-                url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " " + music["title"])
+                url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " - " + music["title"])
 
             except IndexError as le:
                 print(TAG,"Could not find anything in yt -> ",music)
