@@ -330,9 +330,11 @@ def observe():
         retry=5
         while len(url_id) == 0 and retry > 0:
             try:
-                url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " " + music["title"])
                 retry=retry - 1
+                url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " " + music["title"])
 
+            except IndexError as le:
+                print(TAG,"Could not find anything in yt -> ",music)
             except Exception as e:
                 print(e)
                 print(TAG, "error in crawling....will wait for 60s")
@@ -342,7 +344,6 @@ def observe():
             r = os.system("ping -c 1 google.com")
             if r == 0:
                 print(TAG, "did not found in yt", music)
-                time.sleep(3600)
             else:
                 print(TAG,"NET DOWN!!!")
                 time.sleep(3600)
