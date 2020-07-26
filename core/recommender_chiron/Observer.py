@@ -46,6 +46,9 @@ def get_db_connection(db_file):
 def is_music_inserted(music):
     conn = get_db_connection(chiron_db_path)
 
+    music["artist"] = music["artist"].strip()
+    music["title"] = music["title"].strip()
+
     sql = 'SELECT title,artist FROM songs WHERE title="'+music["title"].lower().replace(
         '"', '\'')+'" AND artist="' + music["artist"].lower().replace('"', '\'')+'"'
 
@@ -332,6 +335,9 @@ def observe():
             try:
                 retry=retry - 1
                 url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " - " + music["title"])
+                
+                if url_id == "":
+                    retry = 0
 
             except IndexError as le:
                 print(TAG,"Could not find anything in yt -> ",music)
@@ -344,6 +350,7 @@ def observe():
             r = os.system("ping -c 1 google.com")
             if r == 0:
                 print(TAG, "did not found in yt", music)
+                delete_music(get_music_id(music))
             else:
                 print(TAG,"NET DOWN!!!")
                 time.sleep(3600)

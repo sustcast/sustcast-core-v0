@@ -27,6 +27,7 @@ def initThreads():
 def setModules():
     Scheduler.set_recommender(Chiron)
     Observer.set_modules(CsvUtils,YoutubeUtils)
+    YoutubeUtils.set_modules(Helper)
 
 
 
