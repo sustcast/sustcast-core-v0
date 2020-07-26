@@ -74,7 +74,9 @@ def ytVideoTitleFilter(title):
     title = title.lower()
 
     title = re.sub("[\(\[].*?[\)\]]", "", title)
-
+    
+    title = title.replace("official", "")
+    title = title.replace("video", "")
     title = title.replace("  ", " ")
 
     title = title.strip()

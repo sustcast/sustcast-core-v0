@@ -332,9 +332,6 @@ def observe():
             try:
                 url_id=YoutubeUtils.getYtIdFromMusicName(music['artist'] + " " + music["title"])
                 retry=retry - 1
-                ##
-                print(TAG,"url search")
-                print(url_id)
 
             except Exception as e:
                 print(e)
@@ -345,6 +342,7 @@ def observe():
             r = os.system("ping -c 1 google.com")
             if r == 0:
                 print(TAG, "did not found in yt", music)
+                time.sleep(3600)
             else:
                 print(TAG,"NET DOWN!!!")
                 time.sleep(3600)
@@ -385,7 +383,7 @@ def observe():
         if prev_views >= 0:
             yt_view_increase=str(int(yt_views) - prev_views)
         else:
-            yt_view_increase=str(0)
+            yt_view_increase=str(int(int(yt_views) / 10 ))
 
 
         current_datetime=datetime.now()

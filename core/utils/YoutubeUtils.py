@@ -5,16 +5,18 @@ import random
 import json
 import isodate
 import youtube_dl
+import urllib
+import re
 
 def getYtIdFromMusicName(music):
-    r = random.randint(1, 5)
+    query = urllib.parse.quote(music)
 
-    results = json.loads(YoutubeSearch(music, max_results=r).to_json())
+    url = "https://www.youtube.com/results?search_query=" + query
 
-    try:
-        return results['videos'][0]['id'][:11]
-    except:
-        return ""
+    html = urllib.request.urlopen(url)
+    video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
+    
+    return video_ids[0]
 
 def getDuration_n_ViewsFromId(id):
     url = "https://www.youtube.com/watch?v="+id

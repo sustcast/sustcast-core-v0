@@ -3,6 +3,10 @@ from youtube_search import YoutubeSearch
 import requests
 from bs4 import BeautifulSoup
 import youtube_dl
+import random
+import json
+import urllib
+import re
 
 '''
 url = "https://www.youtube.com/watch?v=OmF1AY3sO9Q"
@@ -35,3 +39,14 @@ with youtube_dl.YoutubeDL(ydl_opts) as ydl:
     ydl.download(['http://www.youtube.com/watch?v=BaW_jenozKc'])
 
 '''
+
+def getYtIdFromMusicName(music):
+    query = urllib.parse.quote(music)
+
+    url = "https://www.youtube.com/results?search_query=" + query
+
+    html = urllib.request.urlopen(url)
+    video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
+    print(video_ids)
+
+getYtIdFromMusicName("linkin park numb")
