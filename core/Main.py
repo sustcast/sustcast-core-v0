@@ -58,12 +58,26 @@ def main():
     while SongDownload.downloadOgg(next_music) == False:
         next_music = Scheduler.shuffle()
     
-    next_music["yt_title"] = YoutubeUtils.getTitleFromId(next_music['url'].replace("https://www.youtube.com/watch?v=",""))
+    
+    ################# TITLE
+    yt_id = next_music['url'].replace("https://www.youtube.com/watch?v=","")
+    yt_title = ""
+
+    retry = 5
+    while retry > 5 and len(yt_title) == 0:
+        yt_title = YoutubeUtils.getTitleFromId(yt_id)
+        retry = retry -1
+    
+    if len(yt_title) == 0:
+        yt_title = next_music['artist'] + ' - ' +next_music['title']
+
+    next_music["yt_title"] = yt_title
+    
     next_music["title_show"] = Helper.ytVideoTitleFilter(next_music["yt_title"])
+    #######################
     print(next_music)
     
     
-
     if( current_music.find("A") < 0 ):
         copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
     else:
