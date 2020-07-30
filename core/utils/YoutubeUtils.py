@@ -60,7 +60,10 @@ def getYtIdFromMusicName(music):
     html = urllib.request.urlopen(url)
     video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
 
-    title = Helper.ytVideoTitleFilter(getTitleFromId(video_ids[0])).lower()
+    title = ""
+    while len(title) == 0:
+        title = Helper.ytVideoTitleFilter(getTitleFromId(video_ids[0])).lower()
+    
     similarity = findSimilarity(music,title)
 
     if similarity >= 0.5 :
