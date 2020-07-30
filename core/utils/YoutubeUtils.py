@@ -44,8 +44,12 @@ def findSimilarity(search,yt_title):
     # cosine formula 
     for i in range(len(rvector)): 
         c+= l1[i]*l2[i] 
-    cosine = c / float((sum(l1)*sum(l2))**0.5) 
     
+    try:
+        cosine = c / float((sum(l1)*sum(l2))**0.5) 
+    except:
+        print("@NLTK>","search -> ", search, "yt_title -> ", yt_title)
+        cosine = 0
     return cosine
 
 def getYtIdFromMusicName(music):
