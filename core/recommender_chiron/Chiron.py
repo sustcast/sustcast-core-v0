@@ -3,6 +3,7 @@ import random
 import time
 import datetime as dt
 import _thread
+import math
 from recommender_chiron import Observer
 
 TAG = "@CHIRON>"
@@ -50,14 +51,13 @@ def recommend():
     dataset = Observer.get_all_music_yt_data()
 
     score_model = []
-    cut_off_constant = 10000
     for music in dataset:
         model = {
             "url": "https://www.youtube.com/watch?v="+ music["url_id"],
             "artist": music["artist"],
             "title":music["title"],
             "duration":music["duration"],
-            "score": int((music["view_increased"])/cut_off_constant)
+            "score": int(math.log2(music['views']*music["view_increased"]))
         }
         
         if(model["score"] > 0):
