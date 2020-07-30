@@ -17,7 +17,7 @@ def observe():
         cur = dt.datetime.now()
         mid_night = dt.datetime(cur.year,cur.month,cur.day,23,59,59)
 
-        wait_time = (mid_night - cur).total_seconds()
+        wait_time = 24*3600
         time.sleep(wait_time)
 
 def music_importer():
