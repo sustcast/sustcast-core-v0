@@ -15,7 +15,7 @@ chiron_db_path = "database/dataset/chiron-dataset/chiron.db"
 
 TAG = "@OBSERVER>"
 MIN_SEC_DIFF = 7*24*3600
-MIN_VIEWS = 100000
+MIN_VIEWS = 20000
 MAX_DURATION = 600.0
 ISOFORMAT = '%Y-%m-%dT%H:%M:%S'
 
