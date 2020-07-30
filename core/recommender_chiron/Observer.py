@@ -5,6 +5,7 @@ import sqlite3
 from sqlite3 import Error
 from datetime import datetime
 import os
+import traceback
 
 # spec = importlib.util.spec_from_file_location("CsvUtils", "../utils/CsvUtils.py")
 # CsvUtils = importlib.util.module_from_spec(spec)
@@ -343,6 +344,7 @@ def observe():
                 print(TAG,"Could not find anything in yt -> ",music)
             except Exception as e:
                 print(e)
+                traceback.print_exc()
                 print(TAG, "error in crawling....will wait for 60s")
                 time.sleep(60)
 
@@ -371,6 +373,7 @@ def observe():
 
             except Exception as e:
                 print(e)
+                
                 print(TAG, "error in crawling....will wait for some time")
                 time.sleep(60)
 
