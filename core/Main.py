@@ -63,10 +63,10 @@ def main():
     yt_id = next_music['url'].replace("https://www.youtube.com/watch?v=","")
     yt_title = ""
 
-    retry = 5
-    while retry > 5 and len(yt_title) == 0:
+    retry = 500
+    while retry > 0 and len(yt_title) == 0:
         yt_title = YoutubeUtils.getTitleFromId(yt_id)
-        retry = retry -1
+        retry = retry - 1
     
     if len(yt_title) == 0:
         yt_title = next_music['artist'] + ' - ' +next_music['title']

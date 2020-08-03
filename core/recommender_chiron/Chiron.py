@@ -57,7 +57,7 @@ def recommend():
             "artist": music["artist"],
             "title":music["title"],
             "duration":music["duration"],
-            "score": int(math.log2(music['views']*music["view_increased"]))
+            "score": int(math.log2(music['views']*music["view_increased"])*10000)
         }
         
         if(model["score"] > 0):

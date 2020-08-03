@@ -8,8 +8,6 @@ import os
 TAG="@SongDownload>"
 def downloadOgg(music):
 
-    print(TAG,"started...")
-
     url = music['url']
     if(url.find("https://www.youtube.com/watch") == 0):
         yt_id = url.replace("https://www.youtube.com/watch?v=","")
@@ -19,7 +17,9 @@ def downloadOgg(music):
             return True
 
 
-        try:            
+        try:
+            print(TAG,"started...")
+                        
             YoutubeUtils.downloadMp3(yt_id)
             
             AudioSegment.from_mp3(Constant.default_mp3_download_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': music['artist'], 'title': music['title']})
