@@ -38,8 +38,10 @@ def setModules():
 
 
 def start_ices():
-    os.system('docker-compose -f ../../ices-docker/docker-compose.yml down')
-    os.system('docker-compose -f ../../ices-docker/docker-compose.yml up -d')
+    os.system('docker-compose -f ../ices-docker/docker-compose.yml down')
+    os.system('docker-compose -f ../ices-docker/docker-compose.yml up -d')
+    
+    time.sleep(10)
 
 def getTitleFromIceCast():
     response = requests.get('http://103.84.159.230:8000/status-json.xsl').text  
