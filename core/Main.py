@@ -92,9 +92,10 @@ def main():
     global prev_music
     global first_load
 
-    setTitleInFirebase(getTitleFromIceCast())
+    current_title = getTitleFromIceCast()
+    setTitleInFirebase(current_title)
     
-    current_music = Helper.findLastPlayedFile()
+    current_music_file = Helper.findLastPlayedFile()
 
     next_music = Scheduler.shuffle()
 
@@ -112,21 +113,16 @@ def main():
     print(next_music)
     
     
-    if( current_music.find("A") < 0 ):
+    if( current_music_file.find("A") < 0 ):
         copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
     else:
         copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
 
-    
-    check = 0
-    while current_music.find(Helper.findLastPlayedFile()) >= 0:
-        if check == 0:
-            time.sleep(prev_music['duration'] - 100)
-        else:
-            time.sleep(5)
+    server_title = getTitleFromIceCast()
+    while current_title.find(server_title) >= 0 and len(server_title) == len(current_title):
+        time.sleep(5)
+        server_title = getTitleFromIceCast()
         
-        check = check + 1
-
     prev_music = next_music
 
 
