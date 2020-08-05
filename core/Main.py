@@ -10,10 +10,16 @@ import SongDownload
 from shutil import copyfile
 from firebase import FireBaseUtil
 import logging
+import requests
+import json
+import os
 
-logging.basicConfig(filename='sustcast_error.log', level=logging.DEBUG, 
+logging.basicConfig(filename='sustcast_error.log', level=logging.ERROR, 
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logger=logging.getLogger(__name__)
+
+LISTEN_URL = 'http://103.84.159.230:8000/sustcast.ogg'
+TAG = '@MASTER>'
 
 def initThreads():
     print("just for later use")
@@ -25,17 +31,58 @@ def initThreads():
     '''
 
 def setModules():
+    Chiron.set_modules(YoutubeUtils,Helper)
     Scheduler.set_recommender(Chiron)
     Observer.set_modules(CsvUtils,YoutubeUtils)
     YoutubeUtils.set_modules(Helper)
 
 
+def start_ices():
+    os.system('docker-compose -f ../../ices-docker/docker-compose.yml down')
+    os.system('docker-compose -f ../../ices-docker/docker-compose.yml up -d')
 
-setModules()
+def getTitleFromIceCast():
+    response = requests.get('http://103.84.159.230:8000/status-json.xsl').text  
+    data = json.loads(response)
+    server_stat = {}
+
+    if 'source' in data['icestats'].keys():
+        if type(data['icestats']['source']) == dict:
+            server_stat = data['icestats']['source']
+            if server_stat['listenurl'] != LISTEN_URL:
+                server_stat = {}
+
+        elif type(data['icestats']['source']) == list:
+            for source in data['icestats']['source']:
+                if source['listenurl'] == LISTEN_URL:
+                    server_stat = source
+                    break
+    else:
+        print(TAG, "server off")
+        start_ices()
+        getTitleFromIceCast()
+
+    if server_stat == {}:
+        print(TAG, "server off")
+        start_ices()
+        getTitleFromIceCast()
+    
+    else:
+        return server_stat['title']
+        
+
+
+def setTitleInFirebase(title):
+    data = {
+        'title_show':title
+    }
+
+    FireBaseUtil.put_artist_title(data)
+
+
 first_load = True
 next_music = {}
 prev_music = {}
-
 
 def main():
 
@@ -43,8 +90,10 @@ def main():
     global prev_music
     global first_load
 
-    current_music = Helper.findLastPlayedFile()
+    setTitleInFirebase(getTitleFromIceCast())
     
+    current_music = Helper.findLastPlayedFile()
+
     next_music = Scheduler.shuffle()
 
     if first_load == True:
@@ -58,23 +107,6 @@ def main():
     while SongDownload.downloadOgg(next_music) == False:
         next_music = Scheduler.shuffle()
     
-    
-    ################# TITLE
-    yt_id = next_music['url'].replace("https://www.youtube.com/watch?v=","")
-    yt_title = ""
-
-    retry = 500
-    while retry > 0 and len(yt_title) == 0:
-        yt_title = YoutubeUtils.getTitleFromId(yt_id)
-        retry = retry - 1
-    
-    if len(yt_title) == 0:
-        yt_title = next_music['artist'] + ' - ' +next_music['title']
-
-    next_music["yt_title"] = yt_title
-    
-    next_music["title_show"] = Helper.ytVideoTitleFilter(next_music["yt_title"])
-    #######################
     print(next_music)
     
     
@@ -84,7 +116,6 @@ def main():
         copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
 
     
-
     check = 0
     while current_music.find(Helper.findLastPlayedFile()) >= 0:
         if check == 0:
@@ -93,16 +124,16 @@ def main():
             time.sleep(5)
         
         check = check + 1
-    
-    FireBaseUtil.put_artist_title(next_music)
 
     prev_music = next_music
 
 
 
-
-while True:
-    try: 
-        main()
-    except Exception as err :
-        logger.error(err)
+if __name__ == '__main__':
+    
+    setModules()
+    while True:
+        try: 
+            main()
+        except Exception as err :
+            logger.error(err)

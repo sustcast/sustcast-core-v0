@@ -9,6 +9,12 @@ from recommender_chiron import Observer
 TAG = "@CHIRON>"
 observer_flag = False
 
+def set_modules(YTUtils,HelperMod):
+    global YoutubeUtils
+    global Helper
+
+    YoutubeUtils = YTUtils
+    Helper = HelperMod
 
 def observe():
 
@@ -65,8 +71,33 @@ def recommend():
     
     selected_song = selectOne(score_model)
 
-    return selected_song
+    final_music = setMeta(selected_song)
+
+    return final_music
     #print(dataset)
+
+
+def setMeta(music):
+
+    yt_id = music['url'].replace("https://www.youtube.com/watch?v=","")
+    yt_title = ""
+
+    retry = 500
+    while retry > 0 and len(yt_title) == 0:
+        yt_title = YoutubeUtils.getTitleFromId(yt_id)
+        retry = retry - 1
+    
+    if len(yt_title) == 0:
+        yt_title = music['artist'] + ' - ' +music['title']
+
+    music["yt_title"] = yt_title
+    
+    music["title_show"] = Helper.ytVideoTitleFilter(music["yt_title"])
+
+    return music
+
+
+
 
 def selectOne(population):
     max     = sum([c["score"] for c in population])

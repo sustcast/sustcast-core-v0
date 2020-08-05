@@ -4,6 +4,8 @@ from utils import Constant
 import time
 from shutil import copyfile
 import os
+import json
+
 
 TAG="@SongDownload>"
 def downloadOgg(music):
@@ -13,7 +15,11 @@ def downloadOgg(music):
         yt_id = url.replace("https://www.youtube.com/watch?v=","")
 
         if os.path.isfile(Constant.default_cache_path+yt_id+".ogg"):
-            copyfile(Constant.default_cache_path+yt_id+".ogg",Constant.default_ogg_download_path)
+            
+            #copyfile(Constant.default_cache_path+yt_id+".ogg",Constant.default_ogg_download_path)
+            AudioSegment.from_ogg(Constant.default_cache_path+yt_id+".ogg").export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']})
+
+
             return True
 
 
@@ -22,7 +28,7 @@ def downloadOgg(music):
                         
             YoutubeUtils.downloadMp3(yt_id)
             
-            AudioSegment.from_mp3(Constant.default_mp3_download_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': music['artist'], 'title': music['title']})
+            AudioSegment.from_mp3(Constant.default_mp3_download_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']})
             
             copyfile(Constant.default_ogg_download_path, Constant.default_cache_path+yt_id+".ogg")
 
