@@ -119,7 +119,7 @@ def main():
         copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
 
     server_title = getTitleFromIceCast()
-    while current_title.find(server_title) >= 0 and len(server_title) == len(current_title):
+    while current_title.find(server_title) >= 0 and len(server_title) == len(current_title) and current_music_file.find(Helper.findLastPlayedFile()) == 0:
         time.sleep(5)
         server_title = getTitleFromIceCast()
         
