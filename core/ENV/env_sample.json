@@ -1,0 +1,5 @@
+{
+    "youtube_api_key":"",
+    "firebase_database_url":"",
+    "icecast_urls": ["http://103.84.159.230:8000/sustcastTEST.ogg"]
+}
