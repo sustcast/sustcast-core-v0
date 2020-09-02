@@ -5,19 +5,26 @@ from firebase_admin import db
 
 TAG="@FIREBASE>"
 
-# Fetch the service account key JSON file contents
-cred = credentials.Certificate(
-    'firebase.json')
-# Initialize the app with a service account, granting admin privileges
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://sustcast-android-app-v1.firebaseio.com/'
-})
+
+def initialize(FIREBASE_DB_URL, FIREBASE_CREDENTIAL_PATH):
+    global songref
+    global iceref
+
+    # Fetch the service account key JSON file contents
+    cred = credentials.Certificate(FIREBASE_CREDENTIAL_PATH)
+    # Initialize the app with a service account, granting admin privileges
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': FIREBASE_DB_URL
+    })
+
+    songref = db.reference('song/')
+    iceref = db.reference("IcecastServer")
+
+
+
 
 
 temp_dict = {"name": 'tananannanana', "artist": 'nazi'}
-
-songref = db.reference('song/')
-iceref = db.reference("IcecastServer")
 
 
 def put_artist_title(gDict):

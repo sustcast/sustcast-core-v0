@@ -19,11 +19,31 @@ logging.basicConfig(filename='sustcast_error.log', level=logging.ERROR,
 logger=logging.getLogger(__name__)
 
 '''
-environment json file -> apiKey,LISTENURL
 youtube genjam
+number of listner update
 '''
-LISTEN_URL = 'http://103.84.159.230:8000/sustcast.ogg'
+
+ENV_PATH = 'ENV/env.json'
+LISTEN_URL = ''
+FIREBASE_DB_URL = ''
+YOUTUBE_API_KEY = ''
+FIRBASE_CREDENTIAL_PATH = 'ENV/firebase.json' 
+
 TAG = '@MASTER>'
+
+def load_environement_variables():
+    global LISTEN_URL
+    global FIREBASE_DB_URL
+    global YOUTUBE_API_KEY
+
+    f = open(ENV_PATH,) 
+    env = json.load(f) 
+    f.close()   
+
+    LISTEN_URL = env['icecast_urls'][0]
+    YOUTUBE_API_KEY = env['youtube_api_key']
+    FIREBASE_DB_URL = env['firebase_database_url']
+
 
 def initThreads():
     print("just for later use")
@@ -38,7 +58,8 @@ def setModules():
     Chiron.set_modules(YoutubeUtils,Helper)
     Scheduler.set_recommender(Chiron)
     Observer.set_modules(CsvUtils,YoutubeUtils)
-    YoutubeUtils.set_modules(Helper)
+    YoutubeUtils.set_modules(Helper,YOUTUBE_API_KEY)
+    FireBaseUtil.initialize(FIREBASE_DB_URL,FIRBASE_CREDENTIAL_PATH)
 
 
 def start_ices():
@@ -133,6 +154,7 @@ def main():
 
 if __name__ == '__main__':
     
+    load_environement_variables()
     setModules()
     while True:
         try: 

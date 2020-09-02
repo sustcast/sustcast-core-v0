@@ -10,10 +10,12 @@ import re
 from nltk.corpus import stopwords 
 from nltk.tokenize import word_tokenize
 
-def set_modules(moduleHelper):
+def set_modules(moduleHelper,api_key):
     global Helper
+    global API_KEY
     
     Helper = moduleHelper
+    API_KEY = api_key
 
 def findSimilarity(search,yt_title):
     X = search
@@ -71,19 +73,49 @@ def getYtIdFromMusicName(music):
     else:
          return ""
 
-def getDuration_n_ViewsFromId(id):
-    url = "https://www.youtube.com/watch?v="+id
-    soup = BeautifulSoup(requests.get(url).text, 'lxml')
-    
+def getMusicInfoFromId(videoid):
+    count = 0
+    endpoint = "https://www.googleapis.com/youtube/v3/videos?id={}&key={}&part=snippet,contentDetails,statistics"
+    url = endpoint.format(videoid, api_key)
+    response = {}
     try:
-        count = soup.select_one('meta[itemprop="interactionCount"][content]')['content']
-        duration = soup.select_one('meta[itemprop="duration"][content]')['content']
-        seconds = isodate.parse_duration(duration).total_seconds()
+        response = json.loads(requests.get(url).text)
+    except Exception as e :
+        count+=1
+        print(e)
         
-        return count,str(seconds)
-    
-    except :
-        return "",""
+    dur = response["items"][0]["contentDetails"]["duration"]
+    seconds = str(isodate.parse_duration(dur).total_seconds())
+    viewCount = response["items"][0]["statistics"]["viewCount"]
+    title = response['items'][0]['snippet']['title']
+
+    music = {
+        "id" : videoid,
+        "title" : title,
+        "views" : viewCount,
+        "duration" : seconds
+    }
+
+    return music 
+
+
+def getDuration_n_ViewsFromId(videoid):
+    count = 0
+    endpoint = "https://www.googleapis.com/youtube/v3/videos?id={}&key={}&part=contentDetails,statistics"
+    url = endpoint.format(videoid, API_KEY)
+    response = {}
+    try:
+        response = json.loads(requests.get(url).text)
+    except Exception as e :
+        count+=1
+        print(e)
+
+    dur = response["items"][0]["contentDetails"]["duration"]
+    seconds = str(isodate.parse_duration(dur).total_seconds())
+
+    viewCount = response["items"][0]["statistics"]["viewCount"]
+
+    return viewCount, seconds
 
 def getTitleFromId(id):
     url = "https://www.youtube.com/watch?v="+id
@@ -111,6 +143,5 @@ def downloadMp3(id):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download(['http://www.youtube.com/watch?v='+id])
-
 
 #print (getDuration_n_ViewsFromId(getYtIdFromMusicName('Dindūn - Chandor Tolay Dekha Hoibo')))
