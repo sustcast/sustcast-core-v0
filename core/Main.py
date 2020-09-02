@@ -18,6 +18,10 @@ logging.basicConfig(filename='sustcast_error.log', level=logging.ERROR,
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logger=logging.getLogger(__name__)
 
+'''
+environment json file -> apiKey,LISTENURL
+youtube genjam
+'''
 LISTEN_URL = 'http://103.84.159.230:8000/sustcast.ogg'
 TAG = '@MASTER>'
 
