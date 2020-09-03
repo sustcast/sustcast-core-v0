@@ -63,6 +63,7 @@ def recommend():
             "artist": music["artist"],
             "title":music["title"],
             "duration":music["duration"],
+            "yt_title":music["yt_title"],
             "score": int(math.log2(music['views']*music["view_increased"])*10000)
         }
         
@@ -70,7 +71,7 @@ def recommend():
             score_model.append(model)
     
     selected_song = selectOne(score_model)
-
+    
     final_music = setMeta(selected_song)
 
     return final_music
@@ -79,18 +80,8 @@ def recommend():
 
 def setMeta(music):
 
-    yt_id = music['url'].replace("https://www.youtube.com/watch?v=","")
-    yt_title = ""
-
-    retry = 500
-    while retry > 0 and len(yt_title) == 0:
-        yt_title = YoutubeUtils.getTitleFromId(yt_id)
-        retry = retry - 1
-    
-    if len(yt_title) == 0:
-        yt_title = music['artist'] + ' - ' +music['title']
-
-    music["yt_title"] = yt_title
+    if music["yt_title"] == None or len(music['yt_title']) == 0:
+        music["yt_title"] = music['artist'] + " - " + music["title"]
     
     music["title_show"] = Helper.ytVideoTitleFilter(music["yt_title"])
 

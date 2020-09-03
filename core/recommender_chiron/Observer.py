@@ -110,7 +110,7 @@ def get_all_music():
 def get_all_music_yt_data():
     conn = get_db_connection(chiron_db_path)
 
-    sql = 'SELECT artist,title,url_id,duration,views,view_increased FROM yt_data join songs ON yt_data.song_id = songs.id;'
+    sql = 'SELECT artist,title,yt_title,url_id,duration,views,view_increased FROM yt_data join songs ON yt_data.song_id = songs.id;'
 
     cur = conn.cursor()
     cur.execute(sql)
@@ -121,10 +121,11 @@ def get_all_music_yt_data():
         music = {
             "artist": row[0],
             "title": row[1],
-            "url_id": row[2],
-            "duration": row[3],
-            "views": row[4],
-            "view_increased": row[5]
+            "yt_title":row[2],
+            "url_id": row[3],
+            "duration": row[4],
+            "views": row[5],
+            "view_increased": row[6]
         }
         ret.append(music)
 
@@ -219,13 +220,13 @@ def insert_music_yt_data(music, update):
     conn = get_db_connection(chiron_db_path)
 
     if(update):
-        sql = 'UPDATE yt_data SET views = '+music["views"]+', duration = '+music["duration"] + \
-            ', view_increased = '+music["view_increased"] + ', last_observed_datetime = "'+music["last_observed_datetime"] + '"'+ \
+        sql = 'UPDATE yt_data SET views = '+music["views"]+', duration = '+music["duration"] +', yt_title = "'+music["yt_title"] + \
+            '", view_increased = '+music["view_increased"] + ', last_observed_datetime = "'+music["last_observed_datetime"] + '"'+ \
             ' WHERE song_id='+str(music["song_id"])
 
     else:
-        sql = 'INSERT INTO yt_data(song_id,views,duration,url_id,view_increased, last_observed_datetime) VALUES('+str(
-            music["song_id"])+','+music["views"]+','+music["duration"]+',"' + music["url_id"]+'",' + music["view_increased"] + ',"' + music["last_observed_datetime"] + '")'
+        sql = 'INSERT INTO yt_data(song_id,views, yt_title , duration,url_id,view_increased, last_observed_datetime) VALUES('+str(
+            music["song_id"])+','+music["views"]+',"'+music["yt_title"]+'",'+music["duration"]+',"' + music["url_id"]+'",' + music["view_increased"] + ',"' + music["last_observed_datetime"] + '")'
 
     try:
         cur = conn.cursor()
@@ -297,8 +298,6 @@ def importMusicsFromCsv():
 
 def observe():
 
-    # TODO make a DB cleaning conditions for removing non-trendy songs. view_increased = 0 -> views < 1 million
-
     print(TAG, "started...")
 
     music_list = get_all_music()
@@ -323,7 +322,9 @@ def observe():
                 current_datetime = datetime.now()
 
                 ### TO SOON ;)
-                if (current_datetime - last_observed_datetime).seconds < MIN_SEC_DIFF:
+                time_diff = current_datetime - last_observed_datetime
+
+                if time_diff.total_seconds() < MIN_SEC_DIFF:
                     continue
 
 
@@ -355,36 +356,47 @@ def observe():
                 delete_music(get_music_id(music))
             else:
                 print(TAG,"NET DOWN!!!")
-                time.sleep(3600)
+                time.sleep(600)
 
             continue
 
         ###
         #print(TAG, "check2")
 
-        yt_views=""
-        yt_duration=""
+        yt_views = ""
+        yt_duration = ""
+        yt_title = ""
         retry=5
         while len(yt_views) == 0 and len(yt_duration) == 0 and retry > 0:
             try:
-                yt_views, yt_duration=YoutubeUtils.getDuration_n_ViewsFromId(
-                    url_id)
-                retry=retry - 1
+                yt_info = YoutubeUtils.getMusicInfoFromId(url_id)
+
+                if yt_info == None:
+                    delete_music(get_music_id(music))
+                    retry = 0
+                    break
+
+                yt_duration = yt_info['duration']
+                yt_views = yt_info['views']
+                yt_title = yt_info['title']
+
+                retry = retry - 1
 
             except Exception as e:
-                print(e)
-                
+                print(TAG,url_id)
+                print(TAG,e)
+                traceback.print_exc()
                 print(TAG, "error in crawling....will wait for some time")
                 time.sleep(60)
 
         if retry == 0:
             r = os.system("ping -c 1 google.com")
             if r == 0:
-                delete_music(get_music_id(music))
+                #delete_music(get_music_id(music))
                 print(TAG, url_id+"is not available in yt", music)
             else:
                 print(TAG,"NET DOWN!!!")
-                time.sleep(3600)
+                time.sleep(600)
             
             continue
         ###
@@ -399,12 +411,13 @@ def observe():
 
         current_datetime=datetime.now()
 
-        music["url_id"]=url_id
-        music["views"]=yt_views
-        music["duration"]=yt_duration
-        music["song_id"]=get_music_id(music)
-        music["view_increased"]=yt_view_increase
-        music["last_observed_datetime"]=current_datetime.strftime(ISOFORMAT)
+        music["url_id"] = url_id
+        music["views"] = yt_views
+        music["duration"] = yt_duration
+        music["yt_title"] = yt_title.replace('"',"'")
+        music["song_id"] = get_music_id(music)
+        music["view_increased"] = yt_view_increase
+        music["last_observed_datetime"] = current_datetime.strftime(ISOFORMAT)
 
         ##
         # time.sleep(200000)
@@ -422,6 +435,7 @@ def observe():
         
         ##
         print(TAG, music)
+        #time.sleep(100)
 
     print(TAG, "completed...")
 

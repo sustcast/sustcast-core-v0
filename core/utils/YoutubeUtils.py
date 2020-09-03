@@ -76,14 +76,17 @@ def getYtIdFromMusicName(music):
 def getMusicInfoFromId(videoid):
     count = 0
     endpoint = "https://www.googleapis.com/youtube/v3/videos?id={}&key={}&part=snippet,contentDetails,statistics"
-    url = endpoint.format(videoid, api_key)
+    url = endpoint.format(videoid, API_KEY)
     response = {}
     try:
         response = json.loads(requests.get(url).text)
     except Exception as e :
         count+=1
         print(e)
-        
+
+    if len(response["items"]) == 0:
+        return None
+
     dur = response["items"][0]["contentDetails"]["duration"]
     seconds = str(isodate.parse_duration(dur).total_seconds())
     viewCount = response["items"][0]["statistics"]["viewCount"]
