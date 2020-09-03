@@ -7,6 +7,8 @@ __pycache__/
 
 # sustcast
 ices.xml
+currentA.ogg
+currentB.ogg
 # C extensions
 *.so
 
