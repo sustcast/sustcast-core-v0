@@ -13,13 +13,14 @@ import logging
 import requests
 import json
 import os
+import traceback
 
 logging.basicConfig(filename='sustcast_error.log', level=logging.ERROR, 
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logger=logging.getLogger(__name__)
 
 '''
-youtube genjam
+scheduling
 number of listner update
 '''
 
@@ -57,6 +58,7 @@ def initThreads():
 def setModules():
     Chiron.set_modules(YoutubeUtils,Helper)
     Scheduler.set_recommender(Chiron)
+    Scheduler.set_modules(Helper,CsvUtils)
     Observer.set_modules(CsvUtils,YoutubeUtils)
     YoutubeUtils.set_modules(Helper,YOUTUBE_API_KEY)
     FireBaseUtil.initialize(FIREBASE_DB_URL,FIRBASE_CREDENTIAL_PATH)
@@ -129,7 +131,7 @@ def main():
         first_load = False
 
     else:
-        while next_music["url"].find(prev_music["url"]) >= 0:
+        while next_music["title_show"].find(prev_music["title_show"]) >= 0:
             next_music = Scheduler.shuffle()
 
     while SongDownload.downloadOgg(next_music) == False:
@@ -160,4 +162,5 @@ if __name__ == '__main__':
         try: 
             main()
         except Exception as err :
+            traceback.print_exc()
             logger.error(err)
