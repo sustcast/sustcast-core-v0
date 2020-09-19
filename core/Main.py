@@ -14,6 +14,7 @@ import requests
 import json
 import os
 import traceback
+import _thread
 
 logging.basicConfig(filename='sustcast_error.log', level=logging.ERROR, 
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
@@ -28,7 +29,8 @@ ENV_PATH = 'ENV/env.json'
 LISTEN_URL = ''
 FIREBASE_DB_URL = ''
 YOUTUBE_API_KEY = ''
-FIRBASE_CREDENTIAL_PATH = 'ENV/firebase.json' 
+FIRBASE_CREDENTIAL_PATH = 'ENV/firebase.json'
+BLOCK_ICECAST_WATCHER = False
 
 TAG = '@MASTER>'
 
@@ -47,13 +49,51 @@ def load_environement_variables():
 
 
 def initThreads():
-    print("just for later use")
-    '''
+    print(TAG, "WORKERS INITIALIZING")
     try:
-        _thread.start_new_thread(newsFetcher, ())
+        _thread.start_new_thread(run_emergency_programs, ())
     except:
         print("Error: unable to start newsFetcher thread")
-    '''
+    
+
+def run_emergency_programs():
+    global BLOCK_ICECAST_WATCHER
+
+    path = "content/emergency_program"
+
+    time.sleep(60)
+    print(TAG, "EMERGENCY PROGRAM WATCHER")
+
+    while(True):    
+        elements = os.listdir(path)
+
+        for element in elements:
+            if element.find(".mp3") >= 0:
+
+                print(TAG," --- emergency program --- ")
+
+                BLOCK_ICECAST_WATCHER = True
+                
+                instant_program = {
+                    "title_show" : element.replace(".mp3",""),
+                    "file" : path+'/'+element
+                }
+
+                SongDownload.downloadOgg(instant_program)
+                copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
+
+                start_ices()
+
+                os.remove(path+'/'+element)
+
+                setTitleInFirebase(element.replace(".mp3",""))
+
+                time.sleep(10)
+                BLOCK_ICECAST_WATCHER = False
+
+        time.sleep(60)
+
+            
 
 def setModules():
     Chiron.set_modules(YoutubeUtils,Helper)
@@ -71,6 +111,11 @@ def start_ices():
     time.sleep(10)
 
 def getTitleFromIceCast():
+    global BLOCK_ICECAST_WATCHER
+
+    while BLOCK_ICECAST_WATCHER == True:
+        time.sleep(10)
+
     response = requests.get('http://103.84.159.230:8000/status-json.xsl').text  
     data = json.loads(response)
     server_stat = {}
@@ -158,6 +203,7 @@ if __name__ == '__main__':
     
     load_environement_variables()
     setModules()
+    initThreads()
     while True:
         try: 
             main()
