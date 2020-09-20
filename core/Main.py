@@ -30,7 +30,6 @@ LISTEN_URL = ''
 FIREBASE_DB_URL = ''
 YOUTUBE_API_KEY = ''
 FIRBASE_CREDENTIAL_PATH = 'ENV/firebase.json'
-BLOCK_ICECAST_WATCHER = False
 
 TAG = '@MASTER>'
 
@@ -71,8 +70,6 @@ def run_emergency_programs():
             if element.find(".mp3") >= 0:
 
                 print(TAG," --- emergency program --- ")
-
-                BLOCK_ICECAST_WATCHER = True
                 
                 instant_program = {
                     "title_show" : element.replace(".mp3",""),
@@ -80,16 +77,16 @@ def run_emergency_programs():
                 }
 
                 SongDownload.downloadOgg(instant_program)
-                copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
 
-                start_ices()
+                current_music_file = Helper.findLastPlayedFile()
+                if( current_music_file.find("A") < 0 ):
+                    copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
+                else:
+                    copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
 
                 os.remove(path+'/'+element)
 
-                setTitleInFirebase(element.replace(".mp3",""))
-
-                time.sleep(10)
-                BLOCK_ICECAST_WATCHER = False
+                skip_to_next_track()
 
         time.sleep(60)
 
@@ -103,6 +100,9 @@ def setModules():
     YoutubeUtils.set_modules(Helper,YOUTUBE_API_KEY)
     FireBaseUtil.initialize(FIREBASE_DB_URL,FIRBASE_CREDENTIAL_PATH)
 
+def skip_to_next_track():
+    os.system('docker exec -it ices_sustcast kill -SIGHUP 1')
+
 
 def start_ices():
     os.system('docker-compose -f ../ices-docker/docker-compose.yml down')
@@ -112,9 +112,6 @@ def start_ices():
 
 def getTitleFromIceCast():
     global BLOCK_ICECAST_WATCHER
-
-    while BLOCK_ICECAST_WATCHER == True:
-        time.sleep(10)
 
     response = requests.get('http://103.84.159.230:8000/status-json.xsl').text  
     data = json.loads(response)
