@@ -139,7 +139,10 @@ def getTitleFromIceCast():
         getTitleFromIceCast()
     
     else:
-        return server_stat['title']
+        try: 
+            return server_stat['title']
+        except:
+            return "SERVER TESTING RUNNING"
         
 
 
