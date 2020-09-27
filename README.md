@@ -16,6 +16,7 @@ firebase.json file in core/
 venv in core
 create ices.log in ices-docker/log
 create ices.xml in ices-docker/data
+create chiron.db in database/dataset/
 run ices-docker to check everything ok -> docker-compose -f ices-docker/docker-compose.yml up -d
 
 ## on startup:
