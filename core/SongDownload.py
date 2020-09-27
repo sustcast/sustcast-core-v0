@@ -22,7 +22,7 @@ def downloadOgg(music):
         if os.path.isfile(Constant.default_cache_path+yt_id+".ogg"):
             
             #copyfile(Constant.default_cache_path+yt_id+".ogg",Constant.default_ogg_download_path)
-            AudioSegment.from_ogg(Constant.default_cache_path+yt_id+".ogg").export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']})
+            AudioSegment.from_ogg(Constant.default_cache_path+yt_id+".ogg").export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
 
             return True
 
@@ -32,7 +32,7 @@ def downloadOgg(music):
                         
             YoutubeUtils.downloadMp3(yt_id)
             
-            AudioSegment.from_mp3(Constant.default_mp3_download_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']})
+            AudioSegment.from_mp3(Constant.default_mp3_download_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
             
             copyfile(Constant.default_ogg_download_path, Constant.default_cache_path+yt_id+".ogg")
 
@@ -48,7 +48,7 @@ def downloadOgg(music):
     elif 'file' in music:
         file_path = music['file']
 
-        AudioSegment.from_mp3(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']})
+        AudioSegment.from_mp3(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
         
         return True
 
