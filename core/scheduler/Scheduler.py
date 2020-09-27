@@ -1,12 +1,15 @@
 from datetime import datetime
 import os
-
+import time
+from shutil import copyfile
+import _thread
 
 ISOFORMAT = '%Y-%m-%dT%H:%M:%S'
 PROGRAM_LIST_CSV_PATH = 'content/program_schedule.csv'
 PROGRAM_CONTENT_ROOT_PATH = 'content/programs/'
+EMERGENCY_PROGRAM_PATH = "content/emergency_program/"
 TAG = "@SCHEDULER>"
-
+PROGRAM_QUEUE = []
 
 def set_recommender(module):
     global Recommender
@@ -23,46 +26,61 @@ def set_modules(helper, csvUtils):
 def shuffle():
     music = {}
 
+    # PROGRAM EXISTENCE CHECKING
     program_list = get_program_schedule()
 
+    for program in program_list:
 
-    flag_program = False
-    index = 0
-    while index < len(program_list):
-        program  = program_list[index]
+        if program['file'] in PROGRAM_QUEUE:
+            continue
 
-        time_diff = 0
+        current_time = datetime.now()
+        program_time = datetime.strptime(program['time'], ISOFORMAT)
+        time_diff = (program_time - current_time).total_seconds()
 
-        if program["status"] == '0':
-            current_time = datetime.now()
-            program_time = datetime.strptime(program['time'], ISOFORMAT)
+        if time_diff < 0 :
+            continue
 
-            time_diff = (program_time - current_time).total_seconds()
+        if os.path.isfile(PROGRAM_CONTENT_ROOT_PATH + program['file']) == False:
+            print(TAG, "--------------################### FILE DOES NOT EXIST #################------------- => ",program["file"])
+            continue
 
-            if time_diff < 400:
-                music = {
-                    "title_show" : program["title"],
-                    "duration" : program["duration"],
-                    "file" : PROGRAM_CONTENT_ROOT_PATH + program['file']
-                }
+        program_info = {
+            "time" : program['time'],
+            "file_name" : program['file'],
+            "file_path" : PROGRAM_CONTENT_ROOT_PATH + program['file']
+        }
 
-                program_list[index]['status'] = '1'
-                flag_program = True
+        _thread.start_new_thread(run_program_in_specific_time, (program_info,))
 
-        index = index + 1 
+        PROGRAM_QUEUE.append(program['file'])
 
-        if flag_program == True:
-            print(TAG," --- got a program --- " + program["time"])
-            print(TAG," --- delay of program --- " + str(time_diff)) 
-            break
+        print(TAG," --- program queue updated--- ")
+        print(TAG,PROGRAM_QUEUE)
+
+
     
-    if flag_program == True:
-        update_program_schedule(program_list)
-    
-    elif flag_program == False :
-        music = Recommender.recommend()
+    music = Recommender.recommend()
 
     return music
+
+def run_program_in_specific_time(program):
+    program_time = datetime.strptime(program['time'], ISOFORMAT)
+    current_time = datetime.now()
+    time_diff = (program_time - current_time).total_seconds()
+
+    print(TAG," --- got a program --- " + program["time"])
+    print(TAG,program)
+    print(TAG," --- time remaining to broadcast --- " + str(time_diff)) 
+
+    time.sleep(time_diff)
+
+    copyfile(program["file_path"],EMERGENCY_PROGRAM_PATH+"/"+program["file_name"])
+
+    print(TAG," --- program copied to the emergency program folder --- " + program["file_name"])
+
+
+
 
 def get_program_schedule():
     return CsvUtils.readDataFromCsv(PROGRAM_LIST_CSV_PATH)
