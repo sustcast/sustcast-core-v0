@@ -47,12 +47,16 @@ def downloadOgg(music):
     
     elif 'file' in music:
         file_path = music['file']
+        print("Converting")
+        if(file_path.split(".")[-1]!='ogg'):
+                AudioSegment.from_mp3(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
+                print("Conversion Done")
+        else:
+                #AudioSegment.from_ogg(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
+                copyfile(file_path, Constant.default_ogg_download_path)
+                print("ogg file copied succesfully.")
 
-        AudioSegment.from_mp3(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
-        
         return True
 
     return False
 
-    
-        
