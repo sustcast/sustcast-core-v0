@@ -60,7 +60,7 @@ def run_emergency_programs():
 
     path = "content/emergency_program"
 
-    time.sleep(60)
+    time.sleep(30)
     print(TAG, "EMERGENCY PROGRAM WATCHER")
 
     while(True):    
@@ -68,7 +68,6 @@ def run_emergency_programs():
 
         for element in elements:
             if element.find(".mp3") >= 0:
-
                 print(TAG," --- emergency program --- ")
                 
                 instant_program = {
@@ -87,8 +86,27 @@ def run_emergency_programs():
                 os.remove(path+'/'+element)
 
                 skip_to_next_track()
+            elif element.find(".ogg") >= 0:
+                print(TAG," --- emergency program --- ")
+                
+                instant_program = {
+                    "title_show" : element.replace(".ogg",""),
+                    "file" : path+'/'+element
+                }
 
-        time.sleep(60)
+                SongDownload.downloadOgg(instant_program)
+
+                current_music_file = Helper.findLastPlayedFile()
+                if( current_music_file.find("A") < 0 ):
+                    copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
+                else:
+                    copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
+
+                os.remove(path+'/'+element)
+
+                skip_to_next_track()
+
+        time.sleep(30)
 
             
 
