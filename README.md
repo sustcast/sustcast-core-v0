@@ -9,6 +9,7 @@ ffmpeg
 python3
 virtualenv
 pip
+inotify-tools
 
 ## steps:
 prerequisite install

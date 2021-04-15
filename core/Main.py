@@ -74,7 +74,6 @@ def run_emergency_programs():
                     "title_show" : element.replace(".mp3",""),
                     "file" : path+'/'+element
                 }
-
                 SongDownload.downloadOgg(instant_program)
 
                 current_music_file = Helper.findLastPlayedFile()
@@ -93,7 +92,6 @@ def run_emergency_programs():
                     "title_show" : element.replace(".ogg",""),
                     "file" : path+'/'+element
                 }
-
                 SongDownload.downloadOgg(instant_program)
 
                 current_music_file = Helper.findLastPlayedFile()
@@ -119,7 +117,7 @@ def setModules():
     FireBaseUtil.initialize(FIREBASE_DB_URL,FIRBASE_CREDENTIAL_PATH)
 
 def skip_to_next_track():
-    os.system('docker exec -it ices_sustcast kill -SIGHUP 1')
+    os.system('docker exec -i ices_sustcast kill -SIGHUP 1')
 
 
 def start_ices():
