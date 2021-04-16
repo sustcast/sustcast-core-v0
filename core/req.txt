@@ -50,4 +50,3 @@ urllib3==1.25.9
 youtube-dl==2020.5.29
 youtube-search==0.1.3
 nltk==3.5
-music-tag==0.4.2
