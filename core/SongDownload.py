@@ -56,8 +56,9 @@ def downloadOgg(music):
                 
                 title = music['title']
                 new_title = title.replace(" ", "\ ")
-                os.system(f"tracktag --name {new_title} {music}")
-                
+                new_music = file_path.replace(" ", "\ ")
+                os.system(f"tracktag --name {new_title} {new_music}")
+
                 copyfile(file_path, Constant.default_ogg_download_path)
                 print("ogg file copied succesfully.")
 
