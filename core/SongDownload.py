@@ -55,7 +55,19 @@ def downloadOgg(music):
                 #AudioSegment.from_ogg(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
                 
                 title = music['title_show']
-                new_title = title.replace(" ", "\ ")
+                def title_replacer(program_title):
+                    temp_title = ""
+                    if " " in program_title:
+                        temp_title = program_title.replace(" ", "\ ")
+                        return temp_title
+
+                    elif ("_") in program_title:
+                        temp_title = program_title.replace("_", "\ ")
+                        return temp_title
+
+                    else:
+                        return program_title
+                new_title = title_replacer(title)
                 new_music = file_path.replace(" ", "\ ")
                 os.system(f"tracktag --name {new_title} {new_music}")
 
