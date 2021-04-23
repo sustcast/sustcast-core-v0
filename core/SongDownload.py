@@ -47,12 +47,34 @@ def downloadOgg(music):
     
     elif 'file' in music:
         file_path = music['file']
+        print("Converting")
+        if(file_path.split(".")[-1]!='ogg'):
+                AudioSegment.from_mp3(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
+                print("Conversion Done")
+        else:
+                #AudioSegment.from_ogg(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
+                
+                title = music['title_show']
+                def title_replacer(program_title):
+                    temp_title = ""
+                    if " " in program_title:
+                        temp_title = program_title.replace(" ", "\ ")
+                        return temp_title
 
-        AudioSegment.from_mp3(file_path).export(Constant.default_ogg_download_path, format='ogg',tags={'artist': json.dumps(music), 'title': music['title_show']}, parameters=["-ac", "2"])
-        
+                    elif ("_") in program_title:
+                        temp_title = program_title.replace("_", "\ ")
+                        return temp_title
+
+                    else:
+                        return program_title
+                new_title = title_replacer(title)
+                new_music = file_path.replace(" ", "\ ")
+                os.system(f"tracktag --name {new_title} {new_music}")
+
+                copyfile(file_path, Constant.default_ogg_download_path)
+                print("ogg file copied succesfully.")
+
         return True
 
     return False
 
-    
-        

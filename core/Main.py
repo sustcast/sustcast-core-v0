@@ -60,7 +60,7 @@ def run_emergency_programs():
 
     path = "content/emergency_program"
 
-    time.sleep(60)
+    time.sleep(30)
     print(TAG, "EMERGENCY PROGRAM WATCHER")
 
     while(True):    
@@ -68,14 +68,30 @@ def run_emergency_programs():
 
         for element in elements:
             if element.find(".mp3") >= 0:
-
                 print(TAG," --- emergency program --- ")
                 
                 instant_program = {
                     "title_show" : element.replace(".mp3",""),
                     "file" : path+'/'+element
                 }
+                SongDownload.downloadOgg(instant_program)
 
+                current_music_file = Helper.findLastPlayedFile()
+                if( current_music_file.find("A") < 0 ):
+                    copyfile(Constant.default_ogg_download_path, Constant.currentA_path)
+                else:
+                    copyfile(Constant.default_ogg_download_path, Constant.currentB_path)
+
+                os.remove(path+'/'+element)
+
+                skip_to_next_track()
+            elif element.find(".ogg") >= 0:
+                print(TAG," --- emergency program --- ")
+                
+                instant_program = {
+                    "title_show" : element.replace(".ogg",""),
+                    "file" : path+'/'+element
+                }
                 SongDownload.downloadOgg(instant_program)
 
                 current_music_file = Helper.findLastPlayedFile()
@@ -88,7 +104,7 @@ def run_emergency_programs():
 
                 skip_to_next_track()
 
-        time.sleep(60)
+        time.sleep(30)
 
             
 
@@ -101,7 +117,7 @@ def setModules():
     FireBaseUtil.initialize(FIREBASE_DB_URL,FIRBASE_CREDENTIAL_PATH)
 
 def skip_to_next_track():
-    os.system('docker exec -it ices_sustcast kill -SIGHUP 1')
+    os.system('docker exec -i ices_sustcast kill -SIGHUP 1')
 
 
 def start_ices():

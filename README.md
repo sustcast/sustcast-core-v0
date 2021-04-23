@@ -9,6 +9,8 @@ ffmpeg
 python3
 virtualenv
 pip
+inotify-tools
+audiotools
 
 ## steps:
 prerequisite install
